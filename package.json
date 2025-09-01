@@ -15,7 +15,8 @@
     "dev": "vite --force",
     "build": "vite build",
     "lint": "eslint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@coreui/chartjs": "^4.1.0",
@@ -37,6 +38,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
     "eslint-plugin-vue": "^10.4.0",
+    "gh-pages": "^6.3.0",
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "sass": "^1.90.0",
