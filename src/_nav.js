@@ -7,6 +7,12 @@ export default [
   },
   {
     component: "CNavItem",
+    name: "Credit",
+    to: "/credit",
+    icon: "cil-speedometer",
+  },
+  {
+    component: "CNavItem",
     name: "Dashboard",
     to: "/dashboard",
     icon: "cil-speedometer",

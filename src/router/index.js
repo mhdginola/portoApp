@@ -13,8 +13,12 @@ const routes = [
       {
         path: "/margin",
         name: "Margin",
-        component: () =>
-          import(/* webpackChunkName: "dashboard" */ "@/pages/Margin.vue"),
+        component: () => import("@/pages/Margin.vue"),
+      },
+      {
+        path: "/credit",
+        name: "Credit",
+        component: () => import("@/pages/Credit.vue"),
       },
       {
         path: "/dashboard",
