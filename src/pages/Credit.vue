@@ -6,6 +6,9 @@ import {
   CPagination, CPaginationItem,
   CFormInput, CFormLabel, CFormSelect, CButton, CListGroup, CListGroupItem
 } from '@coreui/vue'
+import * as XLSX from "xlsx"
+import jsPDF from "jspdf"
+import "jspdf-autotable"
 
 const principal = ref(1000000000)
 const tenor = ref(240)
@@ -110,6 +113,57 @@ const paginationPages = computed(() => {
   }
   return pages
 })
+
+// ----- EXPORT FUNCTIONS -----
+function exportCSV() {
+  const header = ["Bulan","Bunga (%)","Bunga (Rp)","Pokok (Rp)","Total Bayar (Rp)","Sisa Pinjaman"]
+  const data = monthlyPayments.value.map(p => [
+    p.bulan,
+    p.bunga,
+    Math.round(p.interest),
+    Math.round(p.angsuranPokok),
+    Math.round(p.totalBayar),
+    Math.round(p.sisaPinjaman)
+  ])
+  const csvContent = [header, ...data].map(e => e.join(",")).join("\n")
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute("download", "simulasi_krp.csv")
+  link.click()
+}
+
+function exportXLSX() {
+  const ws = XLSX.utils.json_to_sheet(monthlyPayments.value.map(p => ({
+    Bulan: p.bulan,
+    "Bunga (%)": p.bunga,
+    "Bunga (Rp)": Math.round(p.interest),
+    "Pokok (Rp)": Math.round(p.angsuranPokok),
+    "Total Bayar (Rp)": Math.round(p.totalBayar),
+    "Sisa Pinjaman": Math.round(p.sisaPinjaman)
+  })))
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "Simulasi KRP")
+  XLSX.writeFile(wb, "simulasi_krp.xlsx")
+}
+
+function exportPDF() {
+  const doc = new jsPDF()
+  const columns = ["Bulan","Bunga (%)","Bunga (Rp)","Pokok (Rp)","Total Bayar (Rp)","Sisa Pinjaman"]
+  const rows = monthlyPayments.value.map(p => [
+    p.bulan,
+    p.bunga,
+    Math.round(p.interest),
+    Math.round(p.angsuranPokok),
+    Math.round(p.totalBayar),
+    Math.round(p.sisaPinjaman)
+  ])
+  doc.autoTable({
+    head: [columns],
+    body: rows
+  })
+  doc.save("simulasi_krp.pdf")
+}
 </script>
 
 <template>
@@ -182,6 +236,13 @@ const paginationPages = computed(() => {
           <option value="month">Bulan</option>
         </CFormSelect>
       </div>
+    </div>
+    
+    <!-- EXPORT BUTTONS -->
+    <div class="mb-3 d-flex gap-2">
+      <CButton color="success" @click="exportCSV">Export CSV</CButton>
+      <CButton color="primary" @click="exportXLSX">Export XLSX</CButton>
+      <CButton color="danger" @click="exportPDF">Export PDF</CButton>
     </div>
 
     <!-- Tabel -->
