@@ -47,10 +47,25 @@ function removeFloatingRate(index) {
   floatingRates.value.splice(index, 1)
 }
 
-// Monthly payments calculation
+// DP
+const dpNominal = ref(100000000)
+const dpPercent = ref(10)
+
+// Sinkronisasi DP
+watch(dpNominal, (val) => {
+  dpPercent.value = ((val / principal.value) * 100).toFixed(0)
+})
+
+watch(dpPercent, (val) => {
+  dpNominal.value = ((val / 100) * principal.value).toFixed(0)
+})
+
+const effectivePrincipal = computed(() => principal.value - Number(dpNominal.value))
+
+// Saat menghitung monthlyPayments, gunakan nilai efektif
 const monthlyPayments = computed(() => {
   let payments = []
-  let remaining = principal.value
+  let remaining = principal.value - dpNominal.value // Kurangi DP
   const fixedMonths = fixedUnit.value === "year" ? fixedPeriod.value * 12 : fixedPeriod.value
 
   for (let i = 0; i < tenor.value; i++) {
@@ -69,7 +84,7 @@ const monthlyPayments = computed(() => {
 
     let monthlyRate = rate / 100 / 12
     let interest = remaining * monthlyRate
-    let principalPay = principal.value / tenor.value
+    let principalPay = (principal.value - dpNominal.value) / tenor.value
     let installment = interest + principalPay
     remaining -= principalPay
 
@@ -179,6 +194,22 @@ function exportPDF() {
       <CFormLabel>Tenor (bulan)</CFormLabel>
       <CFormInput v-model.number="tenor" type="number" />
     </div>
+
+    <!-- Tambahkan di bagian Input Pinjaman -->
+    <div class="row mb-3">
+    <div class="col-md-6">
+      <CFormLabel>Uang Muka (DP Nominal)</CFormLabel>
+      <CFormInput v-model.number="dpNominal" type="number" placeholder="Rp" />
+    </div>
+    <div class="col-md-6">
+      <CFormLabel>Uang Muka (DP Persentase)</CFormLabel>
+      <CFormInput v-model.number="dpPercent" type="number" placeholder="%" />
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <p>Plafon efektif setelah DP: Rp {{ new Intl.NumberFormat("id-ID").format(effectivePrincipal) }}</p>
+  </div>
 
     <!-- Fixed Rate -->
     <div class="row mb-3">
