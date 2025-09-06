@@ -1,7 +1,7 @@
 export default [
   {
     component: "CNavItem",
-    name: "margin",
+    name: "Margin",
     to: "/margin",
     icon: "cil-speedometer",
   },
@@ -9,6 +9,12 @@ export default [
     component: "CNavItem",
     name: "Credit",
     to: "/credit",
+    icon: "cil-speedometer",
+  },
+  {
+    component: "CNavItem",
+    name: "Credit Other",
+    to: "/creditOther",
     icon: "cil-speedometer",
   },
   {
